@@ -269,17 +269,6 @@ ${e.message}
         ''');
       success = false;
       return (<Asset>[], <Uri>[], Metadata({}), false);
-      // TODO(https://github.com/dart-lang/native/issues/109): Stop throwing
-      // type errors in native_assets_cli, release a new version of that package
-      // and then remove this.
-      // ignore: avoid_catching_errors
-    } on TypeError {
-      logger.severe('''
-Building native assets for package:${config.packageName} failed.
-build_output.yaml contained a format error.
-        ''');
-      success = false;
-      return (<Asset>[], <Uri>[], Metadata({}), false);
     } finally {
       if (!success) {
         final buildOutputFile =
