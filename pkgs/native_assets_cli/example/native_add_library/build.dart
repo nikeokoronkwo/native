@@ -20,8 +20,9 @@ void main(List<String> args) async {
     name: packageName,
     assetId: 'package:$packageName/${packageName}.dart',
     sources: [
-      'src/$packageName.c',
+      'src/$packageName.cpp',
     ],
+    language: Language.cpp,
   );
   await cbuilder.run(
     buildConfig: buildConfig,
