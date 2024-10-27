@@ -1,3 +1,4 @@
+/// Comments used here are just for dev guidance
 import 'dart:io';
 
 import 'package:path/path.dart' as path;
@@ -20,23 +21,32 @@ Future<void> generateWrapper(Config config) async {
     deleteTempDirWhenDone = false;
   }
 
+  // Get Input module/file
   final input = config.input;
 
+  // Generate Symbol Graph from Input Module/File
   await _generateSymbolgraphJson(
     input.symbolgraphCommand,
     tempDir,
   );
 
+  // Get generated symbol graph name
   final symbolgraphFileName = switch (input) {
     FilesInputConfig() => '${input.generatedModuleName}$symbolgraphFileSuffix',
     ModuleInputConfig() => '${input.module}$symbolgraphFileSuffix',
   };
   final symbolgraphJsonPath = path.join(tempDir.path, symbolgraphFileName);
 
+  // Parse symbol graph into AST
   final declarations = parseAst(symbolgraphJsonPath);
+
+  // Transform generated declarations 
   final transformedDeclarations = transform(declarations);
+
+  // Generate wrapper code
   final wrapperCode = generate(transformedDeclarations, config.preamble);
 
+  // write generated wrapper code to fs
   File.fromUri(config.outputFile).writeAsStringSync(wrapperCode);
 
   if (deleteTempDirWhenDone) {
@@ -48,6 +58,7 @@ Future<void> _generateSymbolgraphJson(
   Command symbolgraphCommand,
   Directory workingDirectory,
 ) async {
+  // run gen command using exec and args from [Command]
   final result = await Process.run(
     symbolgraphCommand.executable,
     symbolgraphCommand.args,

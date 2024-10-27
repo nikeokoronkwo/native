@@ -10,13 +10,17 @@ import 'parsers/parse_declarations.dart';
 import 'parsers/parse_relations_map.dart';
 import 'parsers/parse_symbols_map.dart';
 
+/// Parses declarations from symbol graph at [symbolgraphJsonPath]
 List<Declaration> parseAst(String symbolgraphJsonPath) {
+  // read file into JSON
   final symbolgraphJson = readJsonFile(symbolgraphJsonPath);
 
+  // generate parsed symbol graph from `symbols` and `relationships`
   final symbolgraph = ParsedSymbolgraph(
     parseSymbolsMap(symbolgraphJson),
     parseRelationsMap(symbolgraphJson),
   );
 
+  // generate declarations from symbol graph
   return parseDeclarations(symbolgraph);
 }
