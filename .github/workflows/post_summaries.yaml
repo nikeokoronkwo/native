@@ -6,6 +6,7 @@ on:
   workflow_run:
     workflows:
       - Health
+      - Health (Flutter)
       - Publish
     types:
       - completed
