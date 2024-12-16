@@ -5,6 +5,7 @@ import 'package:path/path.dart' as path;
 
 import 'config.dart';
 import 'generator/generator.dart';
+import 'parser/_core/utils.dart';
 import 'parser/parser.dart';
 import 'transformer/transform.dart';
 
@@ -24,27 +25,37 @@ Future<void> generateWrapper(Config config) async {
   // Get Input module/file
   final input = config.input;
 
-  // Generate Symbol Graph from Input Module/File
-  await _generateSymbolgraphJson(
-    input.symbolgraphCommand,
-    tempDir,
-  );
+  final symbolgraphCommand = input.symbolgraphCommand;
+  if (symbolgraphCommand != null) {
+    await _generateSymbolgraphJson(
+      symbolgraphCommand,
+      tempDir,
+    );
+  }
 
   // Get generated symbol graph name
   final symbolgraphFileName = switch (input) {
     FilesInputConfig() => '${input.generatedModuleName}$symbolgraphFileSuffix',
     ModuleInputConfig() => '${input.module}$symbolgraphFileSuffix',
+    JsonFileInputConfig() => path.absolute(input.jsonFile.path),
   };
   final symbolgraphJsonPath = path.join(tempDir.path, symbolgraphFileName);
+  final symbolgraphJson = readJsonFile(symbolgraphJsonPath);
 
-  // Parse symbol graph into AST
-  final declarations = parseAst(symbolgraphJsonPath);
+  final sourceModule = switch (input) {
+    FilesInputConfig() => null,
+    ModuleInputConfig() => input.module,
+    JsonFileInputConfig() => parseModuleName(symbolgraphJson),
+  };
 
-  // Transform generated declarations 
-  final transformedDeclarations = transform(declarations);
-
-  // Generate wrapper code
-  final wrapperCode = generate(transformedDeclarations, config.preamble);
+  final declarations = parseAst(symbolgraphJson);
+  final transformedDeclarations =
+      transform(declarations, filter: config.include);
+  final wrapperCode = generate(
+    transformedDeclarations,
+    moduleName: sourceModule,
+    preamble: config.preamble,
+  );
 
   // write generated wrapper code to fs
   File.fromUri(config.outputFile).writeAsStringSync(wrapperCode);
