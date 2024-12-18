@@ -8,13 +8,20 @@ import '../../_core/interfaces/objc_annotatable.dart';
 /// Describes a built-in Swift type (e.g Int, String, etc).
 /// TODO(https://github.com/dart-lang/native/issues/1827): Include builtin protocols like `Hashable`, `Numeric`
 enum BuiltInDeclaration implements Declaration, ObjCAnnotatable {
-  swiftNSObject(id: 'c:objc(cs)NSObject', name: 'NSObject'),
+  // Builtin Types
   swiftString(id: 's:SS', name: 'String'),
   swiftInt(id: 's:Si', name: 'Int'),
   swiftFloat(id: 's:Sf', name: 'Float'),
   swiftDouble(id: 's:Sd', name: 'Double'),
   swiftBool(id: 's:Sb', name: 'Bool'),
-  swiftVoid(id: 's:s4Voida', name: 'Void');
+  swiftVoid(id: 's:s4Voida', name: 'Void'),
+
+  // Builtin Data Structures
+  
+
+  // ObjC Builtin Types
+  swiftNSObject(id: 'c:objc(cs)NSObject', name: 'NSObject'),
+  ;
 
   @override
   final String id;
